@@ -43,8 +43,8 @@ int main()
     // Create the Local Variables
     bool blnFlag = true;
 
-    // Get the sentinel control value
-    blnFlag = Sentinel_Control();
+    // // Get the sentinel control value
+    // blnFlag = Sentinel_Control();
 
     // Create the while loop until the user wants to exit the program
     while (blnFlag != false) {
@@ -57,8 +57,8 @@ int main()
         // Get the user inputs
         getData();
 
-        // Get the sentinel control value
-        blnFlag = Sentinel_Control();
+        // // Get the sentinel control value
+        // blnFlag = Sentinel_Control();
     }
     
     // Main should return an int   
@@ -116,11 +116,13 @@ Function Purpose: Function is to get the inputs from the user.
         strMaritalStatus = astrMaritalStatus[1];
         intDependentCount = Get_Dependent_Count(); 
 
-        // Get the total income for both spouses
-        dblGrossIncomeInput = 0.0;
-        for (int i = 0; i < intSPOUSE_COUNT; i++) {
-            dblGrossIncomeInput += Get_Gross_Income();
-        }
+        // // Get the total income for both spouses
+        // dblGrossIncomeInput = 0.0;
+        // for (int i = 0; i < intSPOUSE_COUNT; i++) {
+        //     dblGrossIncomeInput += Get_Gross_Income();
+        // }
+        // Didn't need to find gross income for both spouses, just the collective
+        dblGrossIncomeInput += Get_Gross_Income();
         
     } else {
         intDependentCount = 0;

@@ -26,11 +26,12 @@ const double dblTHIRD_TIER_FIXED_RATE = 8460.00;
 const int intSPOUSE_COUNT = 2;
 
 // Place the headers for each function
+void getData();
 bool Sentinel_Control();
 char Get_Marital_Status();
 int Get_Dependent_Count();
 double Get_Gross_Income();
-double Calc_Tax_Amount(double& dblGrossIncomeInput); 
+double taxAmount(double& dblGrossIncomeInput); 
 double Get_Pension_Percent();
 double Calc_Total_Pension_Saved(double& dblGrossIncomeResult, double& dblPensionPercent);
 double Calc_Total_Tax_Withdrawal();
@@ -40,11 +41,6 @@ void Display_Results(double& dblGrossIncomeInput, double& dblGrossIncomeResult, 
 int main() 
 {
     // Create the Local Variables
-    double dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionTotal, dblPensionPercent;
-    char chrMaritalStatus;
-    int intDependentCount;
-    string astrMaritalStatus[] = {"Single", "Married"};
-    string strMaritalStatus;
     bool blnFlag = true;
 
     // Get the sentinel control value
@@ -58,47 +54,8 @@ int main()
         cout << "dependant count, and pension percentage to calculate the federal tax sum." << endl;
         cout << "----------------------------------------------------------------" << endl;
 
-        // Set the decimal precision
-        cout << fixed << setprecision(2);
-        
-        // Get the input of the marital status
-        chrMaritalStatus = Get_Marital_Status();
-
-        // Check if the marital status is married or single. If married, get the dependent count
-        if (chrMaritalStatus == 'm' || chrMaritalStatus == 'M') {
-            strMaritalStatus = astrMaritalStatus[1];
-            intDependentCount = Get_Dependent_Count(); 
-
-            // Get the total income for both spouses
-            dblGrossIncomeInput = 0.0;
-            for (int i = 0; i < intSPOUSE_COUNT; i++) {
-                dblGrossIncomeInput += Get_Gross_Income();
-            }
-            
-        } else {
-            strMaritalStatus = astrMaritalStatus[0];
-            // Get the gross income from the user
-            dblGrossIncomeInput = Get_Gross_Income();
-        }
-
-        // Get the tax amount 
-        dblTaxAmountResult = Calc_Tax_Amount(dblGrossIncomeInput);
-
-        // Calculate the remaining gross income total
-        dblGrossIncomeResult = dblGrossIncomeInput - dblTaxAmountResult;
-
-        // Get the pension percentage and calculate the total saved
-        dblPensionPercent = Get_Pension_Percent();
-        if (dblPensionPercent > 0) {
-            // Calculate the pension total saved
-            dblPensionTotal = Calc_Total_Pension_Saved(dblGrossIncomeResult, dblPensionPercent);
-            // Since the user has saved for pension plan, subtract the pension total from the gross income 
-            dblGrossIncomeResult -= dblPensionTotal;
-        }
-
-        // Display the result
-        cout << "\n" << endl;
-        Display_Results(dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionPercent, dblPensionTotal, strMaritalStatus, intDependentCount);
+        // Get the user inputs
+        getData();
 
         // Get the sentinel control value
         blnFlag = Sentinel_Control();
@@ -136,6 +93,60 @@ Function Purpose: Function is to gets the continuation selection from the user.
                     cout << "Invalid input. Input must be '1' or '0'. Please try again." << endl;
                 }
             }
+}
+
+void getData() 
+/*
+Function Name: getData
+Function Purpose: Function is to get the inputs from the user.
+*/
+{
+    // Create the Local Variables
+    double dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionTotal, dblPensionPercent;
+    char chrMaritalStatus;
+    int intDependentCount;
+    string astrMaritalStatus[] = {"Single", "Married"};
+    string strMaritalStatus;
+
+    // Get the input of the marital status
+    chrMaritalStatus = Get_Marital_Status();
+
+    // Check if the marital status is married or single. If married, get the dependent count
+    if (chrMaritalStatus == 'm' || chrMaritalStatus == 'M') {
+        strMaritalStatus = astrMaritalStatus[1];
+        intDependentCount = Get_Dependent_Count(); 
+
+        // Get the total income for both spouses
+        dblGrossIncomeInput = 0.0;
+        for (int i = 0; i < intSPOUSE_COUNT; i++) {
+            dblGrossIncomeInput += Get_Gross_Income();
+        }
+        
+    } else {
+        intDependentCount = 0;
+        strMaritalStatus = astrMaritalStatus[0];
+        // Get the gross income from the user
+        dblGrossIncomeInput = Get_Gross_Income();
+    }
+
+    // Get the tax amount 
+    dblTaxAmountResult = taxAmount(dblGrossIncomeInput);
+
+    // Calculate the remaining gross income total
+    dblGrossIncomeResult = dblGrossIncomeInput - dblTaxAmountResult;
+
+    // Get the pension percentage and calculate the total saved
+    dblPensionPercent = Get_Pension_Percent();
+    if (dblPensionPercent > 0) {
+        // Calculate the pension total saved
+        dblPensionTotal = Calc_Total_Pension_Saved(dblGrossIncomeResult, dblPensionPercent);
+        // Since the user has saved for pension plan, subtract the pension total from the gross income 
+        dblGrossIncomeResult -= dblPensionTotal;
+    }
+    
+    // Display the result
+    cout << "\n" << endl;
+    Display_Results(dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionPercent, dblPensionTotal, strMaritalStatus, intDependentCount);
 }
 
 char Get_Marital_Status()
@@ -246,7 +257,7 @@ Function Purpose: Function is to gets the gross income from the user.
     }
 }
 
-double Calc_Tax_Amount(double& dblGrossIncomeInput)
+double taxAmount(double& dblGrossIncomeInput)
 /*
 Function Name: taxAmount
 Function Purpose: Function is to calculate the tax amount based off the user input.

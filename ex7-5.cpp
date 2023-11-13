@@ -16,126 +16,78 @@
 using namespace std;
 
 // Create the constants
-const double dblFIRST_TIER_PERCENT = 0.15; // This is the first percentage of range 0-15,000
-const double dblSECOND_TIER_PERCENT = 0.25; // This is the second percentage of range 15,001-40,000
-const double dblTHIRD_TIER_PERCENT = 0.35; // This is the third percentage of range >= 40,001
+const double dblFIRST_TIER_PERCENT = 0.15; 
+const double dblSECOND_TIER_PERCENT = 0.25; 
+const double dblTHIRD_TIER_PERCENT = 0.35; 
 const double dblFIRST_TIER_MIN = 15000.0;
 const double dblSECOND_TIER_MIN = 40000.0;
 const double dblSECOND_TIER_FIXED_RATE = 2250.00;
 const double dblTHIRD_TIER_FIXED_RATE = 8460.00;
-const int intSPOUSE_COUNT = 2;
+const double dblSINGLE_STANDARD_EXEMPTION_RATE = 4000.00;
+const double dblMARRIED_EXEMPTION_RATE = 7000.00;
+const double dblEXEMPTION_RATE_PER_PERSON = 1500.00;
 
 // Place the headers for each function
-bool Sentinel_Control();
+void getData();
 char Get_Marital_Status();
 int Get_Dependent_Count();
 double Get_Gross_Income();
-double Calc_Tax_Amount(double& dblGrossIncomeInput); 
+double taxAmount(double& dblGrossIncomeInput, string& strMaritalStatus, int& intDependentCount, double& dblPensionPercent); 
 double Get_Pension_Percent();
 double Calc_Total_Pension_Saved(double& dblGrossIncomeResult, double& dblPensionPercent);
 double Calc_Total_Tax_Withdrawal();
-void Display_Results(double& dblGrossIncomeInput, double& dblGrossIncomeResult, double& dblTaxAmountResult, 
-                    double& dblPensionPercent, double& dblPensionTotal, string& strMaritalStatus, int& intDependentCount);
+// void Display_Results(double& dblGrossIncomeInput, double& dblGrossIncomeResult, double& dblTaxAmountResult, 
+//                     double& dblPensionPercent, double& dblPensionTotal, string& strMaritalStatus, int& intDependentCount);
 
 int main() 
 {
-    // Create the Local Variables
-    double dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionTotal, dblPensionPercent;
-    char chrMaritalStatus;
-    int intDependentCount;
-    string astrMaritalStatus[] = {"Single", "Married"};
-    string strMaritalStatus;
-    bool blnFlag = true;
-
-    // Get the sentinel control value
-    blnFlag = Sentinel_Control();
-
-    // Create the while loop until the user wants to exit the program
-    while (blnFlag != false) {
-        // Display instruction message to user
-        cout << "----------------------------------------------------------------" << endl;
-        cout << "You will be prompted to enter your marital status, gross income," << endl;
-        cout << "dependant count, and pension percentage to calculate the federal tax sum." << endl;
-        cout << "----------------------------------------------------------------" << endl;
-
-        // Set the decimal precision
-        cout << fixed << setprecision(2);
-        
-        // Get the input of the marital status
-        chrMaritalStatus = Get_Marital_Status();
-
-        // Check if the marital status is married or single. If married, get the dependent count
-        if (chrMaritalStatus == 'm' || chrMaritalStatus == 'M') {
-            strMaritalStatus = astrMaritalStatus[1];
-            intDependentCount = Get_Dependent_Count(); 
-
-            // Get the total income for both spouses
-            dblGrossIncomeInput = 0.0;
-            for (int i = 0; i < intSPOUSE_COUNT; i++) {
-                dblGrossIncomeInput += Get_Gross_Income();
-            }
-            
-        } else {
-            strMaritalStatus = astrMaritalStatus[0];
-            // Get the gross income from the user
-            dblGrossIncomeInput = Get_Gross_Income();
-        }
-
-        // Get the tax amount 
-        dblTaxAmountResult = Calc_Tax_Amount(dblGrossIncomeInput);
-
-        // Calculate the remaining gross income total
-        dblGrossIncomeResult = dblGrossIncomeInput - dblTaxAmountResult;
-
-        // Get the pension percentage and calculate the total saved
-        dblPensionPercent = Get_Pension_Percent();
-        if (dblPensionPercent > 0) {
-            // Calculate the pension total saved
-            dblPensionTotal = Calc_Total_Pension_Saved(dblGrossIncomeResult, dblPensionPercent);
-            // Since the user has saved for pension plan, subtract the pension total from the gross income 
-            dblGrossIncomeResult -= dblPensionTotal;
-        }
-
-        // Display the result
-        cout << "\n" << endl;
-        Display_Results(dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionPercent, dblPensionTotal, strMaritalStatus, intDependentCount);
-
-        // Get the sentinel control value
-        blnFlag = Sentinel_Control();
-    }
+    // Get the user inputs
+    getData();
     
     // Main should return an int   
     return 0;  
 }    
 
-bool Sentinel_Control()
+void getData() 
 /*
-Function Name: Sentinel_Control
-Function Purpose: Function is to gets the continuation selection from the user.
+Function Name: getData
+Function Purpose: Function is to get the inputs from the user.
 */
 {
-    // Declare Local Variables
-    int intSentinelInput;
+    // Create the Local Variables
+    double dblGrossIncomeInput, dblTaxAmountResult, dblPensionPercent;
+    char chrMaritalStatus;
+    int intDependentCount;
+    string astrMaritalStatus[] = {"Single", "Married"};
+    string strMaritalStatus;
 
-    // Get the user input 
-    cout << "Please enter '1' to continue with the program, or '0' to exit the program: ";
+    // Get the input of the marital status
+    chrMaritalStatus = Get_Marital_Status();
 
-    while (true) {
-        // First check if the user has entered the desired input
-        if (!(cin >> intSentinelInput)) {
-            // Display error message to user about the incorrect input
-            cout << "Invalid input. Input must be '1' or '0'. Please try again." << endl;
-            // Clear the error flag and ignore the rest of the line
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        } else if (intSentinelInput == 1) {
-                    return true; // Continue the program
-                } else if (intSentinelInput == 0) {
-                    return false; // Exit the program
-                } else {
-                    cout << "Invalid input. Input must be '1' or '0'. Please try again." << endl;
-                }
-            }
+    // Check if the marital status is married or single. If married, get the dependent count
+    if (chrMaritalStatus == 'm' || chrMaritalStatus == 'M') {
+        strMaritalStatus = astrMaritalStatus[1];
+        intDependentCount = Get_Dependent_Count(); 
+
+        // Get the total income for both spouses
+        dblGrossIncomeInput = Get_Gross_Income();
+
+    } else {
+        intDependentCount = 0;
+        strMaritalStatus = astrMaritalStatus[0];
+        // Get the gross income from the user
+        dblGrossIncomeInput = Get_Gross_Income();
+    }
+
+    // Get the pension percentage and calculate the total saved
+    dblPensionPercent = Get_Pension_Percent();
+
+    // Get the tax amount 
+    dblTaxAmountResult = taxAmount(dblGrossIncomeInput, strMaritalStatus, intDependentCount, dblPensionPercent);
+    
+    // Display the result
+    cout << "Federal tax owed: $" << dblTaxAmountResult << endl;
+
 }
 
 char Get_Marital_Status()
@@ -177,40 +129,20 @@ Function Purpose: Function is to get the dependant count if the user has declare
 {
     // Declare Local Variables
     int intDependInput = 0;
-    char chrInput;
 
     // Get the user input for if they have dependents under the age of 14 years old
-    cout << "Please enter 'y or Y' for if you have any dependents under the age of 14, or 'n or N' for No: ";
+    cout << "Please enter the number of dependents in your house hold: ";
     while (true) {
         // First check if the user has entered the desired input
-        if (!(cin >> chrInput)) {
+        if (!(cin >> intDependInput)) {
             // Display error message to user about the incorrect input
-            cout << "Invalid input. Input must be 'y or Y' or 'n or N'. Please try again." << endl;
-            // Clear the error flag and ignore the rest of the line
+            cout << "Invalid input. Input must be an integer. Please try again." << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        } else if (chrInput == 'y' || chrInput == 'Y') {
-            // Get the input for the dependents
-            cout << "Please enter the number of dependents in your house hold: ";
-            while (true) {
-                // First check if the user has entered the desired input
-                if (!(cin >> intDependInput)) {
-                    // Display error message to user about the incorrect input
-                    cout << "Invalid input. Input must be an integer. Please try again." << endl;
-                    cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                } else if (intDependInput >= 0) {
-                    return intDependInput;
-                } else {
-                    cout << "Invalid input. Input must be a positive integer. Please try again.";
-                    cin.clear();
-                }
-            }
-        } else if (chrInput == 'n' || chrInput == 'N') {
-            // The user has declared they are married status
+        } else if (intDependInput >= 0) {
             return intDependInput;
         } else {
-            cout << "Invalid input. Input must be 'y or Y' or 'n or N'. Please try again." << endl;
+            cout << "Invalid input. Input must be a positive integer. Please try again.";
             cin.clear();
         }
     }
@@ -246,28 +178,32 @@ Function Purpose: Function is to gets the gross income from the user.
     }
 }
 
-double Calc_Tax_Amount(double& dblGrossIncomeInput)
+double taxAmount(double& dblGrossIncomeInput, string& strMaritalStatus, int& intDependentCount, double& dblPensionPercent)
 /*
 Function Name: taxAmount
 Function Purpose: Function is to calculate the tax amount based off the user input.
 */
 {
     // Declare Local Variables
-    double dblTaxAmount = 0.0;
+    double dblExemptionAmount;
+    double dblTaxIncome;
 
-    // Set the decimal precision
-    cout << fixed << setprecision(2);
-
-    // Calculate the tax amount
-    if (dblGrossIncomeInput <= dblFIRST_TIER_MIN) {
-        dblTaxAmount = dblGrossIncomeInput * dblFIRST_TIER_PERCENT;
-    } else if (dblGrossIncomeInput <= dblSECOND_TIER_MIN) {
-        dblTaxAmount = dblGrossIncomeInput * dblSECOND_TIER_PERCENT + dblSECOND_TIER_FIXED_RATE;
+    // Get the exemption amount
+    if (strMaritalStatus == "Married") {
+        dblExemptionAmount = dblMARRIED_EXEMPTION_RATE + (dblEXEMPTION_RATE_PER_PERSON * (intDependentCount + 2));
     } else {
-        dblTaxAmount = dblGrossIncomeInput * dblTHIRD_TIER_PERCENT + dblTHIRD_TIER_FIXED_RATE;
+        dblExemptionAmount = dblSINGLE_STANDARD_EXEMPTION_RATE + dblEXEMPTION_RATE_PER_PERSON;
     }
 
-    return dblTaxAmount;
+    // Calculate the taxable income amount
+    dblTaxIncome = dblGrossIncomeInput - dblExemptionAmount - (dblGrossIncomeInput * dblPensionPercent); 
+    if (dblTaxIncome <= dblFIRST_TIER_MIN) {
+        return dblTaxIncome * dblFIRST_TIER_PERCENT;
+    } else if (dblTaxIncome <= dblSECOND_TIER_MIN) {
+        return dblSECOND_TIER_FIXED_RATE + (dblTaxIncome - dblFIRST_TIER_MIN) * dblSECOND_TIER_PERCENT;
+    } else {
+        return dblTHIRD_TIER_FIXED_RATE + (dblTaxIncome - dblSECOND_TIER_MIN) * dblTHIRD_TIER_PERCENT;
+    }
 }
 
 double Get_Pension_Percent()
@@ -318,20 +254,20 @@ Function Purpose: Function is to calculate the total of the pension saved.
     return dblTotalPensionResult;
 }
 
-void Display_Results(double& dblGrossIncomeInput, double& dblGrossIncomeResult, double& dblTaxAmountResult, 
-                    double& dblPensionPercent, double& dblPensionTotal, string& strMaritalStatus, int& intDependentCount)
-/*
-Function Name: Display_Results
-Function Purpose: Function is to display the results.
-*/
-{
-    cout << "----------------------------- Tax Results -----------------------------" << endl;
-    cout << setfill('.') << left << setw(40) << "Marital Status: " << right << strMaritalStatus << endl;
-    cout << setfill('.') << left << setw(40) << "Total Dependents: " << right  << intDependentCount << endl;
-    cout << setfill('.') << left << setw(40) << "Total Pension Percentage: " << right << fixed << setprecision(2) << "%" << dblPensionPercent << endl;
-    cout << setfill('.') << left << setw(40) << "Total Pension Saved: " << right << fixed << setprecision(2) << "$" << dblPensionTotal << endl;
-    cout << setfill('.') << left << setw(40) << "Total Gross Income Before Tax: " << right << "$"  << dblGrossIncomeInput << endl;
-    cout << setfill('.') << left << setw(40) << "Total Tax On Gross Income: " << right << "$"  << dblTaxAmountResult << endl;
-    cout << setfill('.') << left << setw(40) << "Total Gross Income After Tax: " << right << fixed << setprecision(2) << "$" << dblGrossIncomeResult << endl;
-    cout << endl;
-}
+// void Display_Results(double& dblGrossIncomeInput, double& dblGrossIncomeResult, double& dblTaxAmountResult, 
+//                     double& dblPensionPercent, double& dblPensionTotal, string& strMaritalStatus, int& intDependentCount)
+// /*
+// Function Name: Display_Results
+// Function Purpose: Function is to display the results.
+// */
+// {
+//     cout << "----------------------------- Tax Results -----------------------------" << endl;
+//     cout << setfill('.') << left << setw(40) << "Marital Status: " << right << strMaritalStatus << endl;
+//     cout << setfill('.') << left << setw(40) << "Total Dependents: " << right  << intDependentCount << endl;
+//     cout << setfill('.') << left << setw(40) << "Total Pension Percentage: " << right << fixed << setprecision(2) << "%" << dblPensionPercent << endl;
+//     cout << setfill('.') << left << setw(40) << "Total Pension Saved: " << right << fixed << setprecision(2) << "$" << dblPensionTotal << endl;
+//     cout << setfill('.') << left << setw(40) << "Total Gross Income Before Tax: " << right << "$"  << dblGrossIncomeInput << endl;
+//     cout << setfill('.') << left << setw(40) << "Total Tax On Gross Income: " << right << "$"  << dblTaxAmountResult << endl;
+//     cout << setfill('.') << left << setw(40) << "Total Gross Income After Tax: " << right << fixed << setprecision(2) << "$" << dblGrossIncomeResult << endl;
+//     cout << endl;
+// }

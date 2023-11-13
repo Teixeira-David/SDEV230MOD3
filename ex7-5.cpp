@@ -55,7 +55,7 @@ Function Purpose: Function is to get the inputs from the user.
 */
 {
     // Create the Local Variables
-    double dblGrossIncomeInput, dblGrossIncomeResult, dblTaxAmountResult, dblPensionTotal, dblPensionPercent;
+    double dblGrossIncomeInput, dblTaxAmountResult, dblPensionPercent;
     char chrMaritalStatus;
     int intDependentCount;
     string astrMaritalStatus[] = {"Single", "Married"};
@@ -190,16 +190,16 @@ Function Purpose: Function is to calculate the tax amount based off the user inp
 
     // Get the exemption amount
     if (strMaritalStatus == "Married") {
-        dblExemptionAmount = dblMARRIED_EXEMPTION_RATE + dblEXEMPTION_RATE_PER_PERSON * (intDependentCount + 2);
+        dblExemptionAmount = dblMARRIED_EXEMPTION_RATE + (dblEXEMPTION_RATE_PER_PERSON * (intDependentCount + 2));
     } else {
         dblExemptionAmount = dblSINGLE_STANDARD_EXEMPTION_RATE + dblEXEMPTION_RATE_PER_PERSON;
     }
 
     // Calculate the taxable income amount
     dblTaxIncome = dblGrossIncomeInput - dblExemptionAmount - (dblGrossIncomeInput * dblPensionPercent); 
-    if (dblGrossIncomeInput <= dblFIRST_TIER_MIN) {
+    if (dblTaxIncome <= dblFIRST_TIER_MIN) {
         return dblTaxIncome * dblFIRST_TIER_PERCENT;
-    } else if (dblGrossIncomeInput <= dblSECOND_TIER_MIN) {
+    } else if (dblTaxIncome <= dblSECOND_TIER_MIN) {
         return dblSECOND_TIER_FIXED_RATE + (dblTaxIncome - dblFIRST_TIER_MIN) * dblSECOND_TIER_PERCENT;
     } else {
         return dblTHIRD_TIER_FIXED_RATE + (dblTaxIncome - dblSECOND_TIER_MIN) * dblTHIRD_TIER_PERCENT;
